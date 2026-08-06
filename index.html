@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help Desk — Submit a Ticket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #f4f0e6;
+    --paper-dark: #e8e1d0;
+    --ink: #2a2b28;
+    --ink-soft: #5c5b52;
+    --line: #c9c0a8;
+    --stamp-red: #b5432f;
+    --stamp-green: #3f6b4f;
+    --stamp-amber: #b8792f;
+    --accent: #2d5a5a;
+    --accent-dark: #1e3f3f;
+    --focus: #2d5a5a;
+    --shadow: rgba(42,43,40,0.12);
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper-dark);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(42,43,40,0.05) 1px, transparent 0);
+    background-size: 18px 18px;
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding: 48px 20px;
+  }
+
+  .desk{
+    width:100%;
+    max-width: 980px;
+  }
+
+  header.masthead{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 14px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  header.masthead h1{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 0.02em;
+    margin:0;
+    text-transform: uppercase;
+  }
+
+  header.masthead .tagline{
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  .ticket-wrap{
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    background: var(--paper);
+    box-shadow: 0 12px 32px var(--shadow);
+    border: 1px solid var(--line);
+    position: relative;
+  }
+
+  /* perforation between form and stub */
+  .ticket-wrap::before{
+    content:"";
+    position:absolute;
+    top:0; bottom:0;
+    right:260px;
+    width:0;
+    border-left: 2px dashed var(--line);
+  }
+  .ticket-wrap::after{
+    content:"";
+    position:absolute;
+    top:0; bottom:0;
+    right: 260px;
+    margin-right: -9px;
+    width: 18px;
+    background-image:
+      radial-gradient(circle 9px at 9px 0, transparent 9px, var(--paper-dark) 9.5px);
+    background-size: 18px 36px;
+    background-repeat: repeat-y;
+  }
+
+  form{
+    padding: 40px 44px;
+  }
+
+  .field{
+    margin-bottom: 24px;
+  }
+
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .field .hint{
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  input[type="text"], input[type="email"], input[type="tel"], select, textarea{
+    width:100%;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size: 0.98rem;
+    padding: 11px 12px;
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  input:focus, select:focus, textarea:focus{
+    outline: none;
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px rgba(45,90,90,0.15);
+  }
+
+  textarea{ min-height: 120px; resize: vertical; }
+
+  .row2{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  fieldset{
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 14px 16px 10px;
+    margin: 0 0 24px;
+  }
+
+  fieldset legend{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    padding: 0 6px;
+  }
+
+  .severity-option{
+    display:flex;
+    align-items:flex-start;
+    gap: 10px;
+    padding: 9px 4px;
+    border-bottom: 1px dotted var(--line);
+    cursor:pointer;
+  }
+  .severity-option:last-child{ border-bottom:none; }
+  .severity-option input{ margin-top: 3px; accent-color: var(--accent); }
+  .severity-option .label-main{ font-weight: 600; font-size: 0.92rem; }
+  .severity-option .label-sub{ font-size: 0.8rem; color: var(--ink-soft); display:block; }
+
+  .checkbox-line{
+    display:flex;
+    align-items:center;
+    gap: 9px;
+    font-size: 0.92rem;
+    margin-bottom: 10px;
+  }
+  .checkbox-line input{ accent-color: var(--accent); width:16px; height:16px; }
+
+  button.submit{
+    font-family:'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--accent);
+    color: #fbf8f0;
+    border: none;
+    padding: 15px 28px;
+    border-radius: 3px;
+    cursor:pointer;
+    width:100%;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  button.submit:hover{ background: var(--accent-dark); }
+  button.submit:active{ transform: translateY(1px); }
+  button.submit:disabled{ opacity:0.6; cursor: default; }
+
+  .error-msg{
+    color: var(--stamp-red);
+    font-size: 0.85rem;
+    margin-top: 10px;
+    display:none;
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  /* --- Stub --- */
+  .stub{
+    padding: 34px 22px;
+    background: var(--paper-dark);
+    display:flex;
+    flex-direction: column;
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  .stub .stub-label{
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+
+  .stub .stub-number{
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 22px;
+    word-break: break-all;
+  }
+
+  .stub-block{
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px dotted var(--line);
+  }
+  .stub-block:last-of-type{ border-bottom:none; }
+
+  .stub-block .k{
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 3px;
+  }
+  .stub-block .v{
+    font-size: 0.88rem;
+    color: var(--ink);
+    min-height: 1.1em;
+    word-break: break-word;
+  }
+
+  .stamp{
+    margin-top: auto;
+    align-self: flex-start;
+    border: 3px solid var(--stamp-green);
+    color: var(--stamp-green);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transform: rotate(-6deg);
+    opacity: 0.85;
+  }
+  .stamp.pending{ border-color: var(--ink-soft); color: var(--ink-soft); }
+  .stamp.urgent{ border-color: var(--stamp-red); color: var(--stamp-red); }
+  .stamp.high{ border-color: var(--stamp-amber); color: var(--stamp-amber); }
+
+  /* --- Confirmation state --- */
+  .confirm{
+    display:none;
+    padding: 60px 44px;
+    text-align:center;
+  }
+  .confirm .big-check{
+    font-size: 2.4rem;
+    margin-bottom: 12px;
+  }
+  .confirm h2{
+    font-family:'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .confirm p{ color: var(--ink-soft); margin: 6px 0; }
+  .confirm .ticket-num{
+    display:inline-block;
+    margin-top: 14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:700;
+    font-size: 1.3rem;
+    border: 2px dashed var(--line);
+    padding: 8px 18px;
+    border-radius: 4px;
+  }
+  .confirm button{
+    margin-top: 24px;
+    background:none;
+    border: 1px solid var(--ink-soft);
+    color: var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    padding: 10px 18px;
+    border-radius: 3px;
+    cursor:pointer;
+  }
+
+  footer.note{
+    text-align:center;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-top: 18px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  @media (max-width: 720px){
+    .ticket-wrap{ grid-template-columns: 1fr; }
+    .ticket-wrap::before, .ticket-wrap::after{ display:none; }
+    .stub{ order: -1; border-bottom: 2px dashed var(--line); flex-direction: row; flex-wrap: wrap; gap: 16px; }
+    .stub-block{ border-bottom:none; padding-bottom:0; margin-bottom:0; flex: 1 1 120px; }
+    .stub .stub-number{ width:100%; margin-bottom: 8px; }
+    .stamp{ margin-top: 0; }
+    form{ padding: 28px 24px; }
+    .row2{ grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    button.submit{ transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="desk">
+  <header class="masthead">
+    <h1>Household IT — Ticket Intake</h1>
+    <span class="tagline">avg. reply time: eventually</span>
+  </header>
+
+  <div class="ticket-wrap">
+    <form id="ticketForm">
+
+      <div class="field">
+        <label for="name">Your name</label>
+        <input type="text" id="name" name="name" required autocomplete="name">
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label for="contact">Best way to reach you</label>
+          <input type="text" id="contact" name="contact" placeholder="phone, email, or text" required>
+        </div>
+        <div class="field">
+          <label for="device">What's it about</label>
+          <select id="device" name="device" required>
+            <option value="" disabled selected>Choose one</option>
+            <option>Computer or laptop</option>
+            <option>Phone or tablet</option>
+            <option>Wifi or internet</option>
+            <option>Printer</option>
+            <option>TV or streaming</option>
+            <option>Smart home device</option>
+            <option>Email or password</option>
+            <option>Something else</option>
+          </select>
+        </div>
+      </div>
+
+      <fieldset>
+        <legend>How bad is it</legend>
+        <label class="severity-option">
+          <input type="radio" name="severity" value="Just curious" required>
+          <span><span class="label-main">Just curious</span><span class="label-sub">No rush, whenever you get a chance</span></span>
+        </label>
+        <label class="severity-option">
+          <input type="radio" name="severity" value="Annoying">
+          <span><span class="label-main">Annoying</span><span class="label-sub">I can work around it for now</span></span>
+        </label>
+        <label class="severity-option">
+          <input type="radio" name="severity" value="Stuck">
+          <span><span class="label-main">I'm stuck</span><span class="label-sub">Can't get this done without help</span></span>
+        </label>
+        <label class="severity-option">
+          <input type="radio" name="severity" value="Urgent">
+          <span><span class="label-main">Urgent</span><span class="label-sub">Something's broken, lost, or actual smoke</span></span>
+        </label>
+      </fieldset>
+
+      <div class="field">
+        <label for="description">What's going on</label>
+        <textarea id="description" name="description" placeholder="What were you doing when it happened? What does the screen say?" required></textarea>
+        <div class="hint">The more detail, the fewer follow-up questions.</div>
+      </div>
+
+      <div class="checkbox-line">
+        <input type="checkbox" id="remote" name="remote_ok" value="Yes">
+        <label for="remote" style="margin:0; text-transform:none; font-size:0.92rem; letter-spacing:normal; font-family:'IBM Plex Sans',sans-serif; color:var(--ink);">Okay to remote in or call to walk through it</label>
+      </div>
+
+      <button type="submit" class="submit" id="submitBtn">Submit ticket</button>
+      <div class="error-msg" id="errorMsg">Something didn't go through. Check your connection and try again, or reach out directly.</div>
+    </form>
+
+    <aside class="stub">
+      <div class="stub-label">Ticket No.</div>
+      <div class="stub-number" id="stubNumber">— — — —</div>
+
+      <div class="stub-block">
+        <div class="k">Filed by</div>
+        <div class="v" id="stubName">—</div>
+      </div>
+      <div class="stub-block">
+        <div class="k">Category</div>
+        <div class="v" id="stubDevice">—</div>
+      </div>
+      <div class="stub-block">
+        <div class="k">Filed on</div>
+        <div class="v" id="stubDate">—</div>
+      </div>
+
+      <div class="stamp pending" id="stubStamp">Pending</div>
+    </aside>
+
+    <div class="confirm" id="confirmView">
+      <div class="big-check">✓</div>
+      <h2>Ticket received</h2>
+      <p>Hang tight — I'll follow up using the contact info you gave me.</p>
+      <div class="ticket-num" id="confirmNumber">#0000</div>
+      <br>
+      <button type="button" id="newTicketBtn">File another ticket</button>
+    </div>
+  </div>
+
+  <footer class="note">Every ticket lands as a row in the household tech support sheet, marked Incomplete until it's done.</footer>
+</div>
+
+<script>
+  // ---- CONFIGURE THIS ----
+  // Tickets are stored as rows in a Google Sheet (which doubles as your CSV —
+  // File > Download > Comma Separated Values any time you want an export).
+  //
+  // Setup:
+  // 1. Make a Google Sheet with exactly these column headers in row 1:
+  //    Ticket Number | Date | Name | Contact | Category | Severity | Description | Remote OK | Progress
+  // 2. Go to https://sheetdb.io, sign up free, and connect that sheet.
+  // 3. Copy the API endpoint it gives you (looks like https://sheetdb.io/api/v1/abc123xyz)
+  //    and paste it below.
+  const SHEETDB_ENDPOINT = "https://sheetdb.io/api/v1/c48hp7l3bopp3";
+  // -------------------------
+
+  const form = document.getElementById('ticketForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const ticketWrap = document.querySelector('.ticket-wrap');
+  const confirmView = document.getElementById('confirmView');
+
+  const stubNumber = document.getElementById('stubNumber');
+  const stubName = document.getElementById('stubName');
+  const stubDevice = document.getElementById('stubDevice');
+  const stubDate = document.getElementById('stubDate');
+  const stubStamp = document.getElementById('stubStamp');
+  const confirmNumber = document.getElementById('confirmNumber');
+
+  function makeTicketNumber(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    return `${d.getFullYear().toString().slice(2)}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(Math.floor(Math.random()*90+10))}`;
+  }
+
+  let currentTicketNumber = makeTicketNumber();
+  stubNumber.textContent = currentTicketNumber;
+  stubDate.textContent = new Date().toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
+
+  document.getElementById('name').addEventListener('input', e => {
+    stubName.textContent = e.target.value || '—';
+  });
+  document.getElementById('device').addEventListener('change', e => {
+    stubDevice.textContent = e.target.value || '—';
+  });
+  form.querySelectorAll('input[name="severity"]').forEach(radio => {
+    radio.addEventListener('change', e => {
+      stubStamp.classList.remove('pending','urgent','high');
+      if(e.target.value === 'Urgent'){
+        stubStamp.textContent = 'Urgent';
+        stubStamp.classList.add('urgent');
+      } else if(e.target.value === 'Stuck'){
+        stubStamp.textContent = 'Priority';
+        stubStamp.classList.add('high');
+      } else {
+        stubStamp.textContent = e.target.value;
+        stubStamp.classList.add('pending');
+      }
+    });
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.style.display = 'none';
+
+    if(SHEETDB_ENDPOINT.includes('YOUR_SHEET_ID')){
+      errorMsg.textContent = "This ticket desk isn't wired up yet — the site owner needs to add a SheetDB endpoint in index.html.";
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    const severityField = form.querySelector('input[name="severity"]:checked');
+    const row = {
+      "Ticket Number": currentTicketNumber,
+      "Date": new Date().toLocaleString(),
+      "Name": document.getElementById('name').value,
+      "Contact": document.getElementById('contact').value,
+      "Category": document.getElementById('device').value,
+      "Severity": severityField ? severityField.value : '',
+      "Description": document.getElementById('description').value,
+      "Remote OK": document.getElementById('remote').checked ? 'Yes' : 'No',
+      "Progress": "Incomplete"
+    };
+
+    try{
+      const res = await fetch(SHEETDB_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: row })
+      });
+
+      if(res.ok){
+        confirmNumber.textContent = '#' + currentTicketNumber;
+        ticketWrap.querySelectorAll(':scope > form, :scope > aside').forEach(el => el.style.display = 'none');
+        confirmView.style.display = 'block';
+      } else {
+        throw new Error('Request failed');
+      }
+    } catch(err){
+      errorMsg.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit ticket';
+    }
+  });
+
+  document.getElementById('newTicketBtn').addEventListener('click', () => {
+    form.reset();
+    currentTicketNumber = makeTicketNumber();
+    stubNumber.textContent = currentTicketNumber;
+    stubName.textContent = '—';
+    stubDevice.textContent = '—';
+    stubStamp.textContent = 'Pending';
+    stubStamp.classList.remove('urgent','high');
+    stubStamp.classList.add('pending');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit ticket';
+    errorMsg.style.display = 'none';
+    confirmView.style.display = 'none';
+    form.style.display = 'block';
+    document.querySelector('.stub').style.display = 'flex';
+  });
+</script>
+
+</body>
+</html>
